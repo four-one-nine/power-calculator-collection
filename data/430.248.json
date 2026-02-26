@@ -1,0 +1,23 @@
+{
+  "title": "NEC Table 430.248 - Full-Load Current Motors (Single-Phase)",
+  "note": "Values for single-phase motors. For motors rated at 200V, use 230V values.",
+  "data": [
+    { "hp": 0.125, "amps_115v": 3.2, "amps_230v": 1.6 },
+    { "hp": 0.167, "amps_115v": 4.4, "amps_230v": 2.2 },
+    { "hp": 0.25, "amps_115v": 5.8, "amps_230v": 2.9 },
+    { "hp": 0.333, "amps_115v": 7.2, "amps_230v": 3.6 },
+    { "hp": 0.5, "amps_115v": 9.8, "amps_230v": 4.9 },
+    { "hp": 0.75, "amps_115v": 13.8, "amps_230v": 6.9 },
+    { "hp": 1, "amps_115v": 16, "amps_230v": 8 },
+    { "hp": 1.5, "amps_115v": 20, "amps_230v": 10 },
+    { "hp": 2, "amps_115v": 24, "amps_230v": 12 },
+    { "hp": 3, "amps_115v": 34, "amps_230v": 17 },
+    { "hp": 5, "amps_115v": 56, "amps_230v": 28 },
+    { "hp": 7.5, "amps_115v": 80, "amps_230v": 40 },
+    { "hp": 10, "amps_115v": 100, "amps_230v": 50 },
+    { "hp": 15, "amps_115v": 130, "amps_230v": 65 },
+    { "hp": 20, "amps_115v": 154, "amps_230v": 77 },
+    { "hp": 25, "amps_115v": 192, "amps_230v": 96 },
+    { "hp": 30, "amps_115v": 248, "amps_230v": 124 }
+  ]
+}
