@@ -7,9 +7,10 @@ interface ResultDisplayProps {
   label: string;
   value: string | number;
   unit?: string;
+  className?: string;
 }
 
-export function ResultDisplay({ label, value, unit }: ResultDisplayProps) {
+export function ResultDisplay({ label, value, unit, className = '' }: ResultDisplayProps) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = async () => {
@@ -20,7 +21,7 @@ export function ResultDisplay({ label, value, unit }: ResultDisplayProps) {
   };
 
   return (
-    <div className="bg-gray-700 rounded-lg p-4 mt-4">
+    <div className={`bg-gray-700 rounded-lg p-3 mt-3 ${className}`}>
       <div className="flex items-center justify-between">
         <span className="text-gray-300 text-sm">{label}</span>
         <button

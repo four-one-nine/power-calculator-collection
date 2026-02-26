@@ -64,8 +64,10 @@ function AmpsToVACard({ onCopy, copiedLabel }: { onCopy: (v: string, l: string) 
 
   return (
     <>
-      <Input label="Amperage" type="number" value={amps} onChange={(e) => setAmps(e.target.value)} placeholder="Enter amps" min="0" step="0.1" />
-      <Input label="Voltage" type="number" value={volts} onChange={(e) => setVolts(e.target.value)} placeholder="Enter voltage" min="0" step="1" />
+      <div className="flex gap-3">
+        <Input className="flex-1" label="Amperage" type="number" value={amps} onChange={(e) => setAmps(e.target.value)} placeholder="Enter amps" min="0" step="0.1" />
+        <Input className="flex-1" label="Voltage" type="number" value={volts} onChange={(e) => setVolts(e.target.value)} placeholder="Enter voltage" min="0" step="1" />
+      </div>
       <Toggle label="Phase" options={[{ value: 'single', label: 'Single-Phase' }, { value: 'three', label: 'Three-Phase' }]} value={phase} onChange={(v) => setPhase(v as PhaseType)} />
       {result !== null && (
         <ResultDisplay label="VA Result" value={result.toFixed(2)} unit="VA" />
@@ -92,8 +94,10 @@ function VaToAmpsCard({ onCopy, copiedLabel }: { onCopy: (v: string, l: string) 
 
   return (
     <>
-      <Input label="VA" type="number" value={va} onChange={(e) => setVa(e.target.value)} placeholder="Enter VA" min="0" step="1" />
-      <Input label="Voltage" type="number" value={volts} onChange={(e) => setVolts(e.target.value)} placeholder="Enter voltage" min="0" step="1" />
+      <div className="flex gap-3">
+        <Input className="flex-1" label="VA" type="number" value={va} onChange={(e) => setVa(e.target.value)} placeholder="Enter VA" min="0" step="1" />
+        <Input className="flex-1" label="Voltage" type="number" value={volts} onChange={(e) => setVolts(e.target.value)} placeholder="Enter voltage" min="0" step="1" />
+      </div>
       <Toggle label="Phase" options={[{ value: 'single', label: 'Single-Phase' }, { value: 'three', label: 'Three-Phase' }]} value={phase} onChange={(v) => setPhase(v as PhaseType)} />
       {result !== null && (
         <ResultDisplay label="Amps Result" value={result.toFixed(2)} unit="A" />
@@ -105,35 +109,38 @@ function VaToAmpsCard({ onCopy, copiedLabel }: { onCopy: (v: string, l: string) 
 function HpToAmpsCard() {
   const [tableType, setTableType] = useState<'430.248' | '430.250'>('430.250');
   const [voltage, setVoltage] = useState('230');
-  const [hp, setHp] = useState('');
-  const [result, setResult] = useState<number | null>(null);
 
   const currentTable = tableType === '430.248' ? table430248 : table430250;
-  const hpOptions = currentTable.data.map((entry: HpEntry) => ({ value: entry.hp.toString(), label: `${entry.hp} HP` }));
 
   const voltageOptions = tableType === '430.248'
     ? [{ value: '115', label: '115V' }, { value: '230', label: '230V' }]
-    : [{ value: '200', label: '200V' }, { value: '230', label: '230V' }, { value: '460', label: '460V' }, { value: '575', label: '575V' }];
+    : [{ value: '208', label: '208V' }, { value: '230', label: '230V' }, { value: '460', label: '460V' }, { value: '575', label: '575V' }];
 
-  useEffect(() => {
-    const hpNum = parseFloat(hp);
-    if (isNaN(hpNum)) { setResult(null); return; }
-    const entry = (currentTable.data as HpEntry[]).find((e) => e.hp === hpNum);
-    if (entry) {
-      const voltageKey = `amps_${voltage}v`;
-      setResult(entry[voltageKey] !== undefined ? entry[voltageKey] : null);
-    } else {
-      setResult(null);
-    }
-  }, [hp, voltage, currentTable, tableType]);
+  const voltageKey = `amps_${voltage}v`;
 
   return (
     <>
-      <Select label="NEC Table" options={[{ value: '430.248', label: 'Table 430.248 (Single-Phase)' }, { value: '430.250', label: 'Table 430.250 (Three-Phase)' }]} value={tableType} onChange={(e) => { setTableType(e.target.value as '430.248' | '430.250'); setHp(''); setResult(null); }} />
+      <Select label="NEC Table" options={[{ value: '430.248', label: 'Table 430.248 (Single-Phase)' }, { value: '430.250', label: 'Table 430.250 (Three-Phase)' }]} value={tableType} onChange={(e) => { setTableType(e.target.value as '430.248' | '430.250'); setVoltage('230'); }} />
       <Select label="Voltage" options={voltageOptions} value={voltage} onChange={(e) => setVoltage(e.target.value)} />
-      <Select label="Horsepower" options={hpOptions} value={hp} onChange={(e) => setHp(e.target.value)} />
-      {result !== null && <ResultDisplay label="Full-Load Current" value={result.toFixed(1)} unit="A" />}
-      <p className="text-gray-500 text-xs mt-4">Source: NEC Table {tableType}</p>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="text-left text-gray-400 border-b border-gray-600">
+              <th className="py-1 pr-3">HP</th>
+              <th className="py-1 pr-3">Amps</th>
+            </tr>
+          </thead>
+          <tbody>
+            {currentTable.data.map((entry: HpEntry) => (
+              <tr key={entry.hp} className="border-b border-gray-700">
+                <td className="py-1 pr-3 text-white">{entry.hp}</td>
+                <td className="py-1 pr-3 text-green-400">{entry[voltageKey]?.toFixed(1) || '—'}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p className="text-gray-500 text-xs mt-2">Source: NEC Table {tableType}</p>
     </>
   );
 }
@@ -171,18 +178,26 @@ function VoltageDropCard() {
 
   return (
     <>
-      <Input label="Current (A)" type="number" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder="Enter current" min="0" step="0.1" />
-      <Select label="Wire Gauge (AWG)" options={WIRE_GAUGE_OPTIONS} value={wireGauge} onChange={(e) => setWireGauge(e.target.value)} />
-      <Input label="One-Way Length (ft)" type="number" value={length} onChange={(e) => setLength(e.target.value)} placeholder="Enter length" min="0" step="1" />
-      <Input label="System Voltage (V)" type="number" value={voltage} onChange={(e) => setVoltage(e.target.value)} placeholder="Enter voltage" min="0" step="1" />
-      <Select label="Phases" options={[{ value: '1', label: 'Single-Phase' }, { value: '3', label: 'Three-Phase' }]} value={phases.toString()} onChange={(e) => setPhases(parseInt(e.target.value))} />
-      <Select label="Conductor Material" options={[{ value: 'copper', label: 'Copper' }, { value: 'aluminum', label: 'Aluminum' }]} value={material} onChange={(e) => setMaterial(e.target.value as 'copper' | 'aluminum')} />
-      <Select label="Ambient Temperature (°C)" options={[{ value: '60', label: '60°C' }, { value: '75', label: '75°C' }, { value: '90', label: '90°C' }]} value={temperature.toString()} onChange={(e) => setTemperature(parseInt(e.target.value))} />
+      <div className="flex gap-3">
+        <Input className="flex-1" label="Current (A)" type="number" value={current} onChange={(e) => setCurrent(e.target.value)} placeholder="Enter current" min="0" step="0.1" />
+        <Input className="flex-1" label="One-Way Length (ft)" type="number" value={length} onChange={(e) => setLength(e.target.value)} placeholder="Enter length" min="0" step="1" />
+      </div>
+      <div className="flex gap-3">
+        <Select className="flex-1" label="Wire Gauge (AWG)" options={WIRE_GAUGE_OPTIONS} value={wireGauge} onChange={(e) => setWireGauge(e.target.value)} />
+        <Input className="flex-1" label="System Voltage (V)" type="number" value={voltage} onChange={(e) => setVoltage(e.target.value)} placeholder="Enter voltage" min="0" step="1" />
+      </div>
+      <div className="flex gap-3">
+        <Select className="flex-1" label="Phases" options={[{ value: '1', label: 'Single-Phase' }, { value: '3', label: 'Three-Phase' }]} value={phases.toString()} onChange={(e) => setPhases(parseInt(e.target.value))} />
+        <Select className="flex-1" label="Conductor Material" options={[{ value: 'copper', label: 'Copper' }, { value: 'aluminum', label: 'Aluminum' }]} value={material} onChange={(e) => setMaterial(e.target.value as 'copper' | 'aluminum')} />
+        <Select className="flex-1" label="Temp (°C)" options={[{ value: '60', label: '60°C' }, { value: '75', label: '75°C' }, { value: '90', label: '90°C' }]} value={temperature.toString()} onChange={(e) => setTemperature(parseInt(e.target.value))} />
+      </div>
       {vdResult !== null && vdPercent !== null && (
         <>
-          <ResultDisplay label="Voltage Drop" value={vdResult.toFixed(2)} unit="V" />
-          <ResultDisplay label="Voltage Drop" value={vdPercent.toFixed(2)} unit="%" />
-          <button onClick={handleExportCSV} className="w-full mt-4 py-2 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors">Export to CSV</button>
+          <div className="flex gap-3">
+            <ResultDisplay className="flex-1" label="Voltage Drop" value={vdResult.toFixed(2)} unit="V" />
+            <ResultDisplay className="flex-1" label="Voltage Drop %" value={vdPercent.toFixed(2)} unit="%" />
+          </div>
+          <button onClick={handleExportCSV} className="w-full mt-2 py-1.5 px-4 bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg transition-colors text-sm">Export to CSV</button>
         </>
       )}
     </>
