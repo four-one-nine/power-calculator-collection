@@ -9,7 +9,7 @@ interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
 export function Input({ label, className = '', ...props }: InputProps) {
   return (
     <div className={`mb-4 ${className}`}>
-      <label className="block text-gray-300 text-sm font-medium mb-1">
+      <label className="block text-gray-300 text-sm font-medium mb-1 align-bottom">
         {label}
       </label>
       <input
@@ -28,7 +28,7 @@ interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
 export function Select({ label, options, className = '', ...props }: SelectProps) {
   return (
     <div className={`mb-4 ${className}`}>
-      <label className="block text-gray-300 text-sm font-medium mb-1">
+      <label className="block text-gray-300 text-sm font-medium mb-1 align-bottom">
         {label}
       </label>
       <select

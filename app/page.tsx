@@ -109,6 +109,7 @@ function VaToAmpsCard({ onCopy, copiedLabel }: { onCopy: (v: string, l: string) 
 function HpToAmpsCard() {
   const [tableType, setTableType] = useState<'430.248' | '430.250'>('430.250');
   const [voltage, setVoltage] = useState('230');
+  const [copiedHp, setCopiedHp] = useState<number | null>(null);
 
   const currentTable = tableType === '430.248' ? table430248 : table430250;
 
@@ -117,6 +118,12 @@ function HpToAmpsCard() {
     : [{ value: '208', label: '208V' }, { value: '230', label: '230V' }, { value: '460', label: '460V' }, { value: '575', label: '575V' }];
 
   const voltageKey = `amps_${voltage}v`;
+
+  const copyToClipboard = async (value: number) => {
+    await navigator.clipboard.writeText(value.toString());
+    setCopiedHp(value);
+    setTimeout(() => setCopiedHp(null), 2000);
+  };
 
   return (
     <>
@@ -134,7 +141,12 @@ function HpToAmpsCard() {
             {currentTable.data.map((entry: HpEntry) => (
               <tr key={entry.hp} className="border-b border-gray-700">
                 <td className="py-1 pr-3 text-white">{entry.hp}</td>
-                <td className="py-1 pr-3 text-green-400">{entry[voltageKey]?.toFixed(1) || '—'}</td>
+                <td className="py-1 pr-3">
+                  <button onClick={() => copyToClipboard(entry[voltageKey])} className="text-green-400 hover:text-green-300 flex items-center gap-1">
+                    {entry[voltageKey]?.toFixed(1) || '—'}
+                    {copiedHp === entry[voltageKey] && <span className="text-xs text-green-400">✓</span>}
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
@@ -189,8 +201,8 @@ function VoltageDropCard() {
       <div className="flex gap-3">
         <Select className="flex-1" label="Phases" options={[{ value: '1', label: 'Single-Phase' }, { value: '3', label: 'Three-Phase' }]} value={phases.toString()} onChange={(e) => setPhases(parseInt(e.target.value))} />
         <Select className="flex-1" label="Conductor Material" options={[{ value: 'copper', label: 'Copper' }, { value: 'aluminum', label: 'Aluminum' }]} value={material} onChange={(e) => setMaterial(e.target.value as 'copper' | 'aluminum')} />
-        <Select className="flex-1" label="Temp (°C)" options={[{ value: '60', label: '60°C' }, { value: '75', label: '75°C' }, { value: '90', label: '90°C' }]} value={temperature.toString()} onChange={(e) => setTemperature(parseInt(e.target.value))} />
       </div>
+      <Select label="Ambient Temperature (°C)" options={[{ value: '60', label: '60°C' }, { value: '75', label: '75°C' }, { value: '90', label: '90°C' }]} value={temperature.toString()} onChange={(e) => setTemperature(parseInt(e.target.value))} />
       {vdResult !== null && vdPercent !== null && (
         <>
           <div className="flex gap-3">
