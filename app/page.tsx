@@ -13,7 +13,7 @@ import table430250 from '@/data/430.250.json';
 
 interface HpEntry {
   hp: number;
-  [key: string]: number;
+  [key: string]: number | null;
 }
 
 export default function Home() {
@@ -142,7 +142,7 @@ function HpToAmpsCard() {
               <tr key={entry.hp} className="border-b border-gray-700">
                 <td className="py-1 pr-3 text-white">{entry.hp}</td>
                 <td className="py-1 pr-3">
-                  <button onClick={() => copyToClipboard(entry[voltageKey])} className="text-green-400 hover:text-green-300 flex items-center gap-1">
+                  <button onClick={() => entry[voltageKey] !== null && copyToClipboard(entry[voltageKey]!)} className={`text-green-400 hover:text-green-300 flex items-center gap-1 ${entry[voltageKey] !== null ? 'cursor-pointer' : 'cursor-default'}`}>
                     {entry[voltageKey]?.toFixed(1) || '—'}
                     {copiedHp === entry[voltageKey] && <span className="text-xs text-green-400">✓</span>}
                   </button>
